@@ -20,18 +20,33 @@ function Login() {
   const handleLogin = () => {
     API.post("/auth/login", login)
       .then((res) => {
-        const role = res.data.role;
 
-        localStorage.setItem("role", role);
+        const token = res.data.token;   // ✅ JWT
+        const role = res.data.role;     // ✅ ROLE
 
-        if (role === "ADMIN") {
-          navigate("/admin-dashboard");
+        if (token !== "Invalid") {
+
+          // ✅ store in localStorage
+          localStorage.setItem("token", token);
+          localStorage.setItem("role", role);
+
+          alert("Login Successful");
+
+          // ✅ role-based navigation
+          if (role === "ADMIN") {
+            navigate("/admin-dashboard");
+          } else {
+            navigate("/customer-dashboard");
+          }
+
         } else {
-          navigate("/customer-dashboard");
+          alert("Invalid login credentials");
         }
+
       })
-      .catch(() => {
-        alert("Invalid login credentials");
+      .catch((err) => {
+        console.error(err);
+        alert("Error during login");
       });
   };
 
@@ -49,6 +64,7 @@ function Login() {
               name="email"
               placeholder="Email"
               className="form-control mb-3"
+              value={login.email}
               onChange={handleChange}
             />
 
@@ -57,6 +73,7 @@ function Login() {
               name="password"
               placeholder="Password"
               className="form-control mb-3"
+              value={login.password}
               onChange={handleChange}
             />
 
